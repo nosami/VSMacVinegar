@@ -128,50 +128,75 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
             }
             else if(obj is DirectoryLocation)
             {
-                await ShowPath(obj.Location);
+                await ShowPath(obj.Location, true);
             }
         }
     }
 
-    class VinegarBaseHandler : CommandHandler
+    [Export(typeof(IVimBufferCreationListener))]
+    class VinegarBaseHandler : CommandHandler, IVimBufferCreationListener
     { 
         public static FilePath _path = null;
-        protected async Task ShowPath(FilePath path)
+        const string VinegarBufferName = "/vinegar";
+        protected async Task ShowPath(FilePath path, bool reuseView)
         {
             _path = path;
-            var buffer = new BufferFromDocument(path);
-            using var stream = new MemoryStream();
-            var output = buffer.Build();
-            stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
-            stream.Position = 0;
-            // Create the file descriptor to be loaded in the editor
-            var descriptor = new FileDescriptor("/vinegar", "text/vinegar", stream, null);
-            // Show the controller in the shell
-            var doc = await IdeServices.DocumentManager.OpenDocument(descriptor);
-            var textView = doc.GetContent<ITextView>();
-            var textBuffer = textView.TextBuffer;
-            textView.Properties[typeof(BufferFromDocument)] = buffer;
-            using var edit = textBuffer.CreateEdit();
-            edit.Replace(new Microsoft.VisualStudio.Text.Span(0, textBuffer.CurrentSnapshot.Length), output);
-            edit.Apply();
+            if (!reuseView)
+            {
+
+                using var stream = new MemoryStream();
+                var output = string.Empty;// buffer.Build();
+                stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
+                stream.Position = 0;
+                // Create the file descriptor to be loaded in the editor
+                var descriptor = new FileDescriptor(VinegarBufferName, "text/vinegar", stream, null);//, stream, null);
+                                                                                                     // Show the controller in the shell
+                var doc = await IdeServices.DocumentManager.OpenDocument(descriptor);
+                // Buffer text is set when the ITextView materializes
+            }
+            else
+            {
+                var doc = IdeServices.DocumentManager.ActiveDocument;
+                var textView = doc.GetContent<ITextView>();
+                SetBufferText(textView);
+            }
         }
 
 
-    }
-
-    [Export(typeof(IVimBufferCreationListener))]
-    internal sealed class VinegarDisableLineNumbersService : IVimBufferCreationListener
-    {
         void IVimBufferCreationListener.VimBufferCreated(IVimBuffer vimBuffer)
         {
-            bool isVinegarView = vimBuffer.Name == "/vinegar";
+            bool isVinegarView = vimBuffer.Name == VinegarBufferName;
             if (isVinegarView)
             {
                 vimBuffer.LocalSettings.Number = false;
                 vimBuffer.LocalSettings.RelativeNumber = false;
+                SetBufferText(vimBuffer.TextView);
             }
         }
+
+        void SetBufferText(ITextView textView)
+        {
+            var buffer = new BufferFromDocument(_path);
+            var textBuffer = textView.TextBuffer;
+            textView.Properties[typeof(BufferFromDocument)] = buffer;
+            using var edit = textBuffer.CreateEdit();
+            edit.Replace(new Microsoft.VisualStudio.Text.Span(0, textBuffer.CurrentSnapshot.Length), buffer.Build());
+            edit.Apply();
+        }
     }
+
+    //internal sealed class VinegarDisableLineNumbersService : IVimBufferCreationListener
+    //{
+    //    void IVimBufferCreationListener.VimBufferCreated(IVimBuffer vimBuffer)
+    //    {
+    //        bool isVinegarView = vimBuffer.Name == "/vinegar";
+    //        if (isVinegarView)
+    //        {
+    //            vimBuffer.LocalSettings.Number = false;
+    //            vimBuffer.LocalSettings.RelativeNumber = false;
+    //        }
+    //    }
+    //}
 
     class OpenUrlTestCommandHandler : VinegarBaseHandler
     {
@@ -198,7 +223,7 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
             {
                 _path = IdeApp.Workbench.ActiveDocument.FilePath.ParentDirectory;
             }
-            await ShowPath(_path);
+            await ShowPath(_path, isVinegarView);
         }
         //protected override void Run()
         //{
