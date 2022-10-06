@@ -14,4 +14,12 @@
 <!--  <ItemGroup>
     <EmbeddedResource Include="Properties\Manifest.addin.xml" />
   </ItemGroup>-->
+  <ItemGroup>
+    <None Remove="Vim.Core" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Vim.Core">
+      <HintPath>..\..\src\VsVim\Binaries\Debug\VimCore\net6.0\Vim.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
 </Project>

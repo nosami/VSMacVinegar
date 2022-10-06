@@ -4,6 +4,11 @@
     <Runtime>
         <Import assembly="ExamplePad.dll" />
     </Runtime>
+	    <!-- Register with Managed Extensibility Framework (MEF) -->
+    <Extension path="/MonoDevelop/Ide/Composition">
+        <Assembly file="ExamplePad.dll" />
+    </Extension>
+
     <Extension path="/MonoDevelop/Ide/Pads">
         <Pad id="ExamplePad.MyFirstPad" defaultPlacement="Bottom" _label="My First Pad" icon="md-project" class="ExamplePad.Class1" />
     </Extension>

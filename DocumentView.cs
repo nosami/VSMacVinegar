@@ -5,10 +5,17 @@ using Microsoft.VisualStudio.Text.Editor;
 using MonoDevelop.Components;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Core;
+using MonoDevelop.Core.Execution;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Documents;
-
+using Vim;
+using System.ComponentModel.Composition;
+using MonoDevelop.Core.Execution;
+using MonoDevelop.Ide;
+using MonoDevelop.Ide.Gui;
+using ExportAttribute = System.ComponentModel.Composition.ExportAttribute;
+using Gtk;
 // *****************************************************************************
 // This example shows how to implement a document controller that shows a view
 // which is not a file.
@@ -137,7 +144,6 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
             var output = buffer.Build();
             stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
             stream.Position = 0;
-
             // Create the file descriptor to be loaded in the editor
             var descriptor = new FileDescriptor("/vinegar", "text/vinegar", stream, null);
             // Show the controller in the shell
@@ -148,6 +154,22 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
             using var edit = textBuffer.CreateEdit();
             edit.Replace(new Microsoft.VisualStudio.Text.Span(0, textBuffer.CurrentSnapshot.Length), output);
             edit.Apply();
+        }
+
+
+    }
+
+    [Export(typeof(IVimBufferCreationListener))]
+    internal sealed class VinegarDisableLineNumbersService : IVimBufferCreationListener
+    {
+        void IVimBufferCreationListener.VimBufferCreated(IVimBuffer vimBuffer)
+        {
+            bool isVinegarView = vimBuffer.Name == "/vinegar";
+            if (isVinegarView)
+            {
+                vimBuffer.LocalSettings.Number = false;
+                vimBuffer.LocalSettings.RelativeNumber = false;
+            }
         }
     }
 
