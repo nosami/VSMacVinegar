@@ -5,15 +5,15 @@ using Mono.Addins.Description;
 
 
 [assembly: Addin(
-"ExamplePad",
-    Namespace = "ExamplePad",
+"Vinegar",
+    Namespace = "Vinegar",
     Version = VersionInfo.Version
 )]
 
-[assembly: AddinName("ExamplePad")]
+[assembly: AddinName("Vinegar")]
 [assembly: AddinCategory("IDE extensions")]
 [assembly: AddinUrl("https://whatever")] //
-[assembly: AddinDescription("My first extension")]
+[assembly: AddinDescription("Vim Vinegar clone for VSMac")]
 [assembly: AddinAuthor("Jason Imison")]
 
 public static class VersionInfo

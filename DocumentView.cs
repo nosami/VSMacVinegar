@@ -6,6 +6,7 @@ using MonoDevelop.Components;
 using MonoDevelop.Components.Commands;
 using MonoDevelop.Core;
 using MonoDevelop.Ide;
+using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Documents;
 
 // *****************************************************************************
@@ -101,29 +102,37 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
     //    OpenCustomEditor
     //}
 
-    class OpenUrlTestCommandHandler : CommandHandler
+    class OpenFileOrFolderCommandHandler : VinegarBaseHandler
     {
         //protected override void Run()
         //{
         //    IdeServices.DocumentManager.OpenDocument(new UrlDescriptor { Url = "http://microsoft.com" });
-        static FilePath _path = null;
         //static CustomEditorDocumentController _controller;
         protected override async void Run()
         {
-            if(_path == null)
+            var doc = IdeServices.DocumentManager.ActiveDocument;
+            var textView = doc.GetContent<ITextView>();
+            var buffer = textView.Properties[typeof(BufferFromDocument)] as BufferFromDocument;
+            var line = textView.Caret.ContainingTextViewLine.Start.GetContainingLineNumber();
+            VinegarOutput? obj = buffer?.Lines.Values[line-1];
+            if(obj is FileLocation)
             {
-                _path = IdeApp.Workbench.ActiveDocument.FilePath.ParentDirectory;
+                await IdeServices.DocumentManager.OpenDocument(new FileOpenInformation(obj.Location));
             }
-            else if(_path.ParentDirectory.IsNull)
+            else if(obj is DirectoryLocation)
             {
-                return;
+                await ShowPath(obj.Location);
             }
-            else if(_path.IsDirectory)
-            {
-                _path = _path.ParentDirectory;
-            }
+        }
+    }
 
-            var buffer = new BufferFromDocument(_path);
+    class VinegarBaseHandler : CommandHandler
+    { 
+        public static FilePath _path = null;
+        protected async Task ShowPath(FilePath path)
+        {
+            _path = path;
+            var buffer = new BufferFromDocument(path);
             using var stream = new MemoryStream();
             var output = buffer.Build();
             stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
@@ -133,12 +142,46 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
             var descriptor = new FileDescriptor("/vinegar", "text/vinegar", stream, null);
             // Show the controller in the shell
             var doc = await IdeServices.DocumentManager.OpenDocument(descriptor);
-            var textBuffer = doc.GetContent<ITextView>().TextBuffer;
+            var textView = doc.GetContent<ITextView>();
+            var textBuffer = textView.TextBuffer;
+            textView.Properties[typeof(BufferFromDocument)] = buffer;
             using var edit = textBuffer.CreateEdit();
             edit.Replace(new Microsoft.VisualStudio.Text.Span(0, textBuffer.CurrentSnapshot.Length), output);
             edit.Apply();
-
         }
+    }
+
+    class OpenUrlTestCommandHandler : VinegarBaseHandler
+    {
+        protected override async void Run()
+        {
+            var doc = IdeServices.DocumentManager.ActiveDocument;
+            var textView = doc.GetContent<ITextView>();
+            //var textBuffer = textView.TextBuffer;
+            bool isVinegarView = textView.Properties.ContainsProperty(typeof(BufferFromDocument));
+
+            if (_path == null)
+            {
+                _path = IdeApp.Workbench.ActiveDocument.FilePath.ParentDirectory;
+            }
+            else if (_path.ParentDirectory.IsNull && isVinegarView) 
+            {
+                return;
+            }
+            else if (_path.IsDirectory && isVinegarView)
+            {
+                _path = _path.ParentDirectory;
+            }
+            else
+            {
+                _path = IdeApp.Workbench.ActiveDocument.FilePath.ParentDirectory;
+            }
+            await ShowPath(_path);
+        }
+        //protected override void Run()
+        //{
+        //    IdeServices.DocumentManager.OpenDocument(new UrlDescriptor { Url = "http://microsoft.com" });
+        //static CustomEditorDocumentController _controller;
     }
 
     abstract class VinegarOutput
@@ -192,6 +235,8 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
             _filePath = filePath;
         }
 
+        internal SortedList<string, VinegarOutput> Lines { get => _lines; set => _lines = value; }
+
         public string Build()
         {
             AddDirectory(_filePath);
@@ -239,33 +284,33 @@ namespace SamplesExtension.DocumentsandViews.UrlDocumentView
 
         public FilePath Path { get; set; }
 
-        protected override async Task OnLoad(bool reloading)
-        {
-            // Get the content from the site
-            HttpClient client = new HttpClient();
-            var buffer = new BufferFromDocument(modelDescriptor.Url);
-            using var stream = new MemoryStream();
-            stream.Write(System.Text.Encoding.UTF8.GetBytes(buffer.Build()));
-            stream.Position = 0;
-            //text = await client.GetStringAsync(.Url);
-            await Initialize(modelDescriptor);
-        }
-        // Initializes the controller, using the provided file name, type and content
-        public Task InitializeWithContent(string fileName, string fileType, FilePath path)
-        {
-            Path = path;
-            // Write the text into a Stream, since that's what FileDescriptor can take as content
-            var buffer = new BufferFromDocument(path);
-            using var stream = new MemoryStream();
-            stream.Write(System.Text.Encoding.UTF8.GetBytes(buffer.Build()));
-            stream.Position = 0;
+        //protected override async Task OnLoad(bool reloading)
+        //{
+        //    // Get the content from the site
+        //    HttpClient client = new HttpClient();
+        //    var buffer = new BufferFromDocument(modelDescriptor.Url);
+        //    using var stream = new MemoryStream();
+        //    stream.Write(System.Text.Encoding.UTF8.GetBytes(buffer.Build()));
+        //    stream.Position = 0;
+        //    //text = await client.GetStringAsync(.Url);
+        //    await Initialize(modelDescriptor);
+        //}
+        //// Initializes the controller, using the provided file name, type and content
+        //public Task InitializeWithContent(string fileName, string fileType, FilePath path)
+        //{
+        //    Path = path;
+        //    // Write the text into a Stream, since that's what FileDescriptor can take as content
+        //    var buffer = new BufferFromDocument(path);
+        //    using var stream = new MemoryStream();
+        //    stream.Write(System.Text.Encoding.UTF8.GetBytes(buffer.Build()));
+        //    stream.Position = 0;
 
-            // Create the file descriptor to be loaded in the editor
-            var descriptor = new FileDescriptor(fileName, fileType, stream, null);
+        //    // Create the file descriptor to be loaded in the editor
+        //    var descriptor = new FileDescriptor(fileName, fileType, stream, null);
 
-            // Initialize the controller
-            return Initialize(descriptor);
-        }
+        //    // Initialize the controller
+        //    return Initialize(descriptor);
+        //}
 
         //protected override async Task OnInitialize(ModelDescriptor modelDescriptor, Properties status)
         //{

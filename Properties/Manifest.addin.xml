@@ -7,5 +7,27 @@
     <Extension path="/MonoDevelop/Ide/Pads">
         <Pad id="ExamplePad.MyFirstPad" defaultPlacement="Bottom" _label="My First Pad" icon="md-project" class="ExamplePad.Class1" />
     </Extension>
+    <!-- Register the new command -->
+
+	<Extension path = "/MonoDevelop/Ide/Commands">
+
+		<!-- The command Id matches a value in the SamplesExtension.DocumentsandViews.TextViewStats.Commands enum -->
+		<Command id = "SamplesExtension.DocumentsandViews.UrlDocumentView.Commands.OpenUrlTest"
+				_label = "Open Vim Vinegar"
+				macShortcut ="-"
+				defaultHandler = "SamplesExtension.DocumentsandViews.UrlDocumentView.OpenUrlTestCommandHandler" />
+		<Command id = "SamplesExtension.DocumentsandViews.UrlDocumentView.Commands.OpenFileOrFolder"
+				_label = "Open File Or Folder"
+				macShortcut ="Return"
+				defaultHandler = "SamplesExtension.DocumentsandViews.UrlDocumentView.OpenFileOrFolderCommandHandler" />
+		
+	</Extension>
+
+	<!-- Add the command to the gobal Tools menu. It is inserted after the separator with id SamplesExtensionSeparator, which
+	     is defined in the ExtensionModel.addin.xml file at the root of this project -->
+
+	<Extension path = "/MonoDevelop/Ide/MainMenu/Tools">
+		<CommandItem id = "SamplesExtension.DocumentsandViews.UrlDocumentView.Commands.OpenUrlTest" insertafter="SamplesExtensionSeparator"/>
+	</Extension>
 </ExtensionModel>
 
