@@ -78,11 +78,11 @@ namespace Vinegar
             }
             else if (obj is DirectoryLocation)
             {
-                ShowPath(obj.Location, false);
+                ShowPath(obj.Location, false, 0);
             }
         }
         
-        void ShowPath(FilePath path, bool newView)
+        void ShowPath(FilePath path, bool newView, int notebookIndex)
         {
             if (newView)
             {
@@ -90,7 +90,7 @@ namespace Vinegar
                 var output = string.Empty;
                 stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
                 stream.Position = 0;
-                FilePath filePath = path.Combine("vinegar");
+                FilePath filePath = path.Combine(notebookIndex + "vinegar");
                 // Create the file descriptor to be loaded in the editor
                 var descriptor = new FileDescriptor(filePath, "text/vinegar", stream, null);
 
@@ -124,7 +124,7 @@ namespace Vinegar
             var doc = IdeServices.DocumentManager.ActiveDocument;
             var textView = doc.GetContent<ITextView>();
             bool isVinegarView = textView.Properties.ContainsProperty(typeof(VinegarBuffer));
-
+            var notebookIndex = WindowManagement.GetNotebookIndex(textView);
             // Either in a standard document switching to a vinegar view
             // or in a vinegar view navigating up
             if (isVinegarView)
@@ -137,8 +137,9 @@ namespace Vinegar
             else
             { 
                 path = IdeApp.Workbench.ActiveDocument.FilePath.ParentDirectory;
+                
             }
-            ShowPath(path, !isVinegarView);
+            ShowPath(path, !isVinegarView, notebookIndex);
         }
-    }
+   }
 }
