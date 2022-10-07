@@ -3,13 +3,13 @@ using MonoDevelop.Core;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
 using MonoDevelop.Ide.Gui.Documents;
-using SamplesExtension.DocumentsandViews.UrlDocumentView;
 using Vim;
 using ExportAttribute = System.ComponentModel.Composition.ExportAttribute;
+
 namespace Vinegar
 {
     [Export(typeof(IVimBufferCreationListener))]
-    internal sealed class VinegarBufferCreationListener : IVimBufferCreationListener
+    class VinegarBufferCreationListener : IVimBufferCreationListener
     {
         void IVimBufferCreationListener.VimBufferCreated(IVimBuffer vimBuffer)
         {
@@ -24,9 +24,9 @@ namespace Vinegar
         }
     }
 
-    internal sealed class VinegarKeyProcessor : KeyProcessor 
+    class VinegarKeyProcessor : KeyProcessor 
     {
-        private IVimBuffer _vimBuffer;
+        private readonly IVimBuffer _vimBuffer;
 
         public override bool IsInterestedInHandledEvents => true;
         public const string VinegarBufferName = "/vinegar";
@@ -69,14 +69,7 @@ namespace Vinegar
         {
             var doc = IdeServices.DocumentManager.ActiveDocument;
             var textView = doc.GetContent<ITextView>();
-            //if (!textView.Properties.ContainsProperty(typeof(BufferFromDocument)))
-            //{
-            //    _vimBuffer.Process(KeyInputUtil.EnterKey);
-            //    return;
-            //}
-
-
-            var buffer = textView.Properties[typeof(BufferFromDocument)] as BufferFromDocument;
+            var buffer = textView.Properties[typeof(VinegarBuffer)] as VinegarBuffer;
             var line = textView.Caret.ContainingTextViewLine.Start.GetContainingLineNumber();
             VinegarOutput? obj = buffer?.Lines.Values[line - 1];
             if (obj is FileLocation)
@@ -116,9 +109,9 @@ namespace Vinegar
 
         public static void SetBufferText(FilePath path, IVimBuffer vimBuffer, ITextView textView)
         {
-            var buffer = new BufferFromDocument(path);
+            var buffer = new VinegarBuffer(path);
             var textBuffer = textView.TextBuffer;
-            textView.Properties[typeof(BufferFromDocument)] = buffer;
+            textView.Properties[typeof(VinegarBuffer)] = buffer;
             using var edit = textBuffer.CreateEdit();
             edit.Replace(new Microsoft.VisualStudio.Text.Span(0, textBuffer.CurrentSnapshot.Length), buffer.Build());
             edit.Apply();
@@ -130,13 +123,13 @@ namespace Vinegar
             FilePath path;
             var doc = IdeServices.DocumentManager.ActiveDocument;
             var textView = doc.GetContent<ITextView>();
-            bool isVinegarView = textView.Properties.ContainsProperty(typeof(BufferFromDocument));
+            bool isVinegarView = textView.Properties.ContainsProperty(typeof(VinegarBuffer));
 
             // Either in a standard document switching to a vinegar view
             // or in a vinegar view navigating up
             if (isVinegarView)
             {
-                var oldBuffer = (BufferFromDocument)textView.Properties[typeof(BufferFromDocument)];
+                var oldBuffer = (VinegarBuffer)textView.Properties[typeof(VinegarBuffer)];
                 path = oldBuffer.FilePath.ParentDirectory ;
                 if (path.IsNull)
                     return;

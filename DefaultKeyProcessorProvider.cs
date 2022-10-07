@@ -11,7 +11,7 @@ namespace Vinegar
     [TextViewRole(PredefinedTextViewRoles.Interactive)]
     [Name("VinegarKeyProcessor")]
     [Order(Before = "VimKeyProcessor")]
-    internal sealed class DefaultKeyProcessorProvider : IKeyProcessorProvider
+    class DefaultKeyProcessorProvider : IKeyProcessorProvider
     {
         private readonly IVim _vim;
 
