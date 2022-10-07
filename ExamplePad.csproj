@@ -11,15 +11,12 @@
     <PackageReference Include="Microsoft.VisualStudioMac.Sdk" Version="17.0.0" />
   </ItemGroup>
 
-<!--  <ItemGroup>
-    <EmbeddedResource Include="Properties\Manifest.addin.xml" />
-  </ItemGroup>-->
   <ItemGroup>
-    <None Remove="Vim.Core" />
+    <AddinReference Include="MonoDevelop.TextEditor" />
   </ItemGroup>
   <ItemGroup>
     <Reference Include="Vim.Core">
-      <HintPath>..\..\src\VsVim\Binaries\Debug\VimCore\net6.0\Vim.Core.dll</HintPath>
+      <HintPath>..\..\src\VsVim\Binaries\Debug\VimMac\net6.0-macos\Vim.Core.dll</HintPath>
     </Reference>
   </ItemGroup>
 </Project>
