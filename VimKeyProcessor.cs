@@ -19,7 +19,7 @@ namespace Vinegar
                 vimBuffer.LocalSettings.Number = false;
                 vimBuffer.LocalSettings.RelativeNumber = false;
                 var path = new FilePath(vimBuffer.Name).ParentDirectory;
-                VinegarKeyProcessor.SetBufferText(path, vimBuffer, vimBuffer.TextView);
+                VinegarKeyProcessor.SetBufferText(path, vimBuffer.TextView);
             }
         }
     }
@@ -38,20 +38,19 @@ namespace Vinegar
 
         public override void KeyDown(KeyEventArgs e)
         {
-            NSKey key = (NSKey)e.Event.KeyCode;
-            if (_vimBuffer.Name.EndsWith("vinegar") && _vimBuffer.Mode.ModeKind == Vim.ModeKind.Normal)
+            if (_vimBuffer.Name.EndsWith("vinegar") && _vimBuffer.Mode.ModeKind == ModeKind.Normal)
             {
                 e.Handled = true;
                 if (e.Characters == "-")
                 {
                     HyphenPress();
                 }
-                    else if (key == NSKey.Return)
-                    {
+                else if ((NSKey)e.Event.KeyCode == NSKey.Return)
+                {
                     OpenFileOrFolder();
                 }
             }
-            else if (_vimBuffer.Mode.ModeKind == Vim.ModeKind.Normal)
+            else if (_vimBuffer.Mode.ModeKind == ModeKind.Normal)
             {
                 if (e.Characters == "-")
                 {
@@ -101,13 +100,11 @@ namespace Vinegar
             {
                 var doc = IdeServices.DocumentManager.ActiveDocument;
                 var textView = doc.GetContent<ITextView>();
-                SetBufferText(path, _vimBuffer, textView);
+                SetBufferText(path, textView);
             }
         }
 
-
-
-        public static void SetBufferText(FilePath path, IVimBuffer vimBuffer, ITextView textView)
+        public static void SetBufferText(FilePath path, ITextView textView)
         {
             var buffer = new VinegarBuffer(path);
             var textBuffer = textView.TextBuffer;
