@@ -10,6 +10,7 @@
     <Extension path="/MonoDevelop/Ide/Composition">
         <Assembly file="ExamplePad.dll" />
         <Assembly file="Vim.Core.dll" />
+        <Assembly file="Roslyn.Hosting.Diagnostics.dll" />
     </Extension>
 
     <!-- Register the new command -->
