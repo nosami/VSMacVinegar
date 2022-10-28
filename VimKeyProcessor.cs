@@ -1,4 +1,6 @@
-﻿using Microsoft.VisualStudio.Text.Editor;
+﻿using System.ComponentModel.Composition;
+using Microsoft.VisualStudio.Text.Editor;
+using Microsoft.VisualStudio.Utilities;
 using MonoDevelop.Core;
 using MonoDevelop.Ide;
 using MonoDevelop.Ide.Gui;
@@ -11,6 +13,14 @@ namespace Vinegar
     [Export(typeof(IVimBufferCreationListener))]
     class VinegarBufferCreationListener : IVimBufferCreationListener
     {
+        private readonly IContentTypeRegistryService _contentTypeRegistryService;
+
+        [ImportingConstructor]
+        public VinegarBufferCreationListener(IContentTypeRegistryService contentTypeRegistryService)
+        {
+            _contentTypeRegistryService = contentTypeRegistryService;
+        }
+
         void IVimBufferCreationListener.VimBufferCreated(IVimBuffer vimBuffer)
         {
             bool isVinegarView = vimBuffer.Name.EndsWith("vinegar");
@@ -19,6 +29,10 @@ namespace Vinegar
                 vimBuffer.LocalSettings.Number = false;
                 vimBuffer.LocalSettings.RelativeNumber = false;
                 var path = new FilePath(vimBuffer.Name).ParentDirectory;
+
+                var contentType = _contentTypeRegistryService.GetContentType(ContentTypeNames.VinegarContentType);
+                
+                vimBuffer.TextView.TextBuffer.ChangeContentType(contentType, null);
                 VinegarKeyProcessor.SetBufferText(path, vimBuffer.TextView);
             }
         }
@@ -89,9 +103,9 @@ namespace Vinegar
                 var output = string.Empty;
                 stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
                 stream.Position = 0;
-                FilePath filePath = path.Combine(notebookIndex + "vinegar");
+                FilePath filePath = path.Combine(notebookIndex + ".vinegar");
                 // Create the file descriptor to be loaded in the editor
-                var descriptor = new FileDescriptor(filePath, "text/vinegar", stream, null);
+                var descriptor = new FileDescriptor(filePath, "text/" + ContentTypeNames.VinegarContentType, stream, null);
 
                 var doc = IdeServices.DocumentManager.OpenDocument(descriptor);
                 // Buffer text is set when the ITextView materializes

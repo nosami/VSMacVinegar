@@ -18,5 +18,5 @@ using Mono.Addins.Description;
 
 public static class VersionInfo
 { 
-    public const string Version = "0.0.0.4";
+    public const string Version = "0.0.0.7";
 }

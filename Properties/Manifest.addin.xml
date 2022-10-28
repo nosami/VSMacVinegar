@@ -3,7 +3,7 @@
     <!-- Register with Visual Studio for Mac -->
     <Runtime>
         <Import assembly="ExamplePad.dll" />
-
+        <Import assembly="Roslyn.Hosting.Diagnostics.dll" />
     </Runtime>
         <!--<ConditionType id="IsVinegar" type="MonoDevelop.Ide.Extensions.VinegarFileCondition" />-->
 	    <!-- Register with Managed Extensibility Framework (MEF) -->

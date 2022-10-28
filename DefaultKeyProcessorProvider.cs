@@ -8,7 +8,7 @@ namespace Vinegar
 {
     [Export(typeof(IKeyProcessorProvider))]
     [ContentType(VimConstants.ContentType)]
-    //[TextViewRole(PredefinedTextViewRoles.Interactive)]
+    [TextViewRole(PredefinedTextViewRoles.Interactive)]
     [Name("VinegarKeyProcessorProvider")]
     [Order(Before = "VimKeyProcessorProvider")]
     class DefaultKeyProcessorProvider : IKeyProcessorProvider
