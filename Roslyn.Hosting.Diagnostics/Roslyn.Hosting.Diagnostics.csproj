@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <TargetFramework>net6.0-macos</TargetFramework>
+    <PublicSign>True</PublicSign>
+    <SignAssembly>true</SignAssembly>
+    <OtherFlags>--publicsign</OtherFlags>
+    <AssemblyOriginatorKeyFile>roslyn.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <UseSGen>false</UseSGen>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <EnableCodeSigning>false</EnableCodeSigning>
+    <UseSGen>false</UseSGen>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="Vim.Core">
+      <HintPath>..\..\src\VsVim\Binaries\Debug\VimMac\net6.0-macos\Vim.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="System.ComponentModel.Composition" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudioMac.Sdk" Version="17.0.0" />
+  </ItemGroup>
+  <ItemGroup>
+    <AddinReference Include="MonoDevelop.TextEditor" />
+  </ItemGroup>
+</Project>

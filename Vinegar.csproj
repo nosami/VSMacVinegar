@@ -1,0 +1,25 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Library</OutputType>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <TargetFramework>net6.0-macos</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.VisualStudioMac.Sdk" Version="17.0.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <AddinReference Include="MonoDevelop.TextEditor" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="Vim.Core">
+      <HintPath>..\..\src\VsVim\Binaries\Debug\VimMac\net6.0-macos\Vim.Core.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Roslyn.Hosting.Diagnostics\Roslyn.Hosting.Diagnostics.csproj" />
+  </ItemGroup>
+</Project>
