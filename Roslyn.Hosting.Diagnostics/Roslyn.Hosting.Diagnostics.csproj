@@ -2,8 +2,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Library</OutputType>
+    <TargetFramework>net6.0-macos</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
-    <TargetFramework>net7.0-macos12.3</TargetFramework>
     <PublicSign>True</PublicSign>
     <SignAssembly>true</SignAssembly>
     <OtherFlags>--publicsign</OtherFlags>

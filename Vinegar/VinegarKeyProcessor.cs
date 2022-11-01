@@ -109,8 +109,9 @@ namespace Vinegar
                 FilePath filePath = path.Combine("/", notebookIndex + ".vinegar");
                 // Create the file descriptor to be loaded in the editor
                 var descriptor = new FileDescriptor(filePath, ContentTypeNames.VinegarContentType, stream, null);
-
+                descriptor.OpenAsReadOnly = true;
                 var doc = IdeServices.DocumentManager.OpenDocument(descriptor);
+                
                 // Buffer text is set when the ITextView materializes
             }
             else
