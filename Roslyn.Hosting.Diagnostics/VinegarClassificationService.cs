@@ -4,18 +4,14 @@ using Microsoft.CodeAnalysis.Host;
 using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.CodeAnalysis.PooledObjects;
 using Microsoft.CodeAnalysis.Text;
-//using Microsoft.VisualStudio.Utilities;
+using Microsoft.VisualStudio.Text.Editor;
+using MonoDevelop.Ide;
 
 namespace Vinegar
 {
-
-    [ExportLanguageService(typeof(IClassificationService), "vinegar", layer: ServiceLayer.Host)]
+    [ExportLanguageService(typeof(IClassificationService), "text/vinegar", layer: ServiceLayer.Host)]
 	public class VinegarClassificationService: IClassificationService
 	{
-        public VinegarClassificationService()
-        {
-            string s = null;
-        }
         private readonly ObjectPool<List<ClassifiedSpan>> s_listPool = new(() => new());
 
         public ClassifiedSpan AdjustStaleClassification(SourceText text, ClassifiedSpan classifiedSpan)
@@ -59,11 +55,36 @@ namespace Vinegar
         void IClassificationService.AddSyntacticClassifications(SolutionServices services, SyntaxNode root, TextSpan textSpan, ArrayBuilder<ClassifiedSpan> result, CancellationToken cancellationToken)
         {
             
-            string s = null;
         }
 
         Task IClassificationService.AddSyntacticClassificationsAsync(Document document, TextSpan textSpan, ArrayBuilder<ClassifiedSpan> result, CancellationToken cancellationToken)
         {
+            var doc = IdeApp.Workbench.Documents.FirstOrDefault(d => d.Name == document.FilePath);
+            var textView = doc.GetContent<ITextView>();
+            var vinegarBuffer = (VinegarBuffer)textView.Properties[typeof(VinegarBuffer)];
+
+            var span = new Microsoft.VisualStudio.Text.Span(textSpan.Start, textSpan.Length);
+            foreach (var line in textView.TextSnapshot.Lines)
+            {
+                var str = line.GetText();
+                if (!line.Extent.IntersectsWith(span))
+                    continue;
+
+                var lineNumber = line.Start.GetContainingLineNumber();
+                if (lineNumber >= vinegarBuffer.Lines.Count)
+                    continue;
+
+                var bufferLine = vinegarBuffer.Lines[lineNumber];
+
+                if (bufferLine is OriginalLocation)
+                {
+                    result.Add(new ClassifiedSpan("class name", new TextSpan(line.Start, line.Length)));
+                }
+                else if (bufferLine is DirectoryLocation)
+                {
+                    result.Add(new ClassifiedSpan("method name", new TextSpan(line.Start, line.Length)));
+                }
+            }
             return Task.CompletedTask;
         }
     }

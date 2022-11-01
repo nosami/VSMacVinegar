@@ -1,6 +1,4 @@
-﻿using System;
-using System.Xml.Linq;
-using Mono.Addins;
+﻿using Mono.Addins;
 using Mono.Addins.Description;
 
 
@@ -18,5 +16,5 @@ using Mono.Addins.Description;
 
 public static class VersionInfo
 { 
-    public const string Version = "0.0.0.7";
+    public const string Version = "0.0.0.9";
 }

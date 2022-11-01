@@ -2,17 +2,17 @@
 <ExtensionModel>
     <!-- Register with Visual Studio for Mac -->
     <Runtime>
-        <Import assembly="ExamplePad.dll" />
+        <Import assembly="Vinegar.dll" />
         <Import assembly="Roslyn.Hosting.Diagnostics.dll" />
     </Runtime>
         <!--<ConditionType id="IsVinegar" type="MonoDevelop.Ide.Extensions.VinegarFileCondition" />-->
 	    <!-- Register with Managed Extensibility Framework (MEF) -->
     <Extension path="/MonoDevelop/Ide/Composition">
-        <Assembly file="ExamplePad.dll" />
+        <Assembly file="Vinegar.dll" />
         <Assembly file="Vim.Core.dll" />
         <Assembly file="Roslyn.Hosting.Diagnostics.dll" />
     </Extension>
-
+    ---
     <!-- Register the new command -->
 <!--
 	<Extension path = "/MonoDevelop/Ide/Commands">

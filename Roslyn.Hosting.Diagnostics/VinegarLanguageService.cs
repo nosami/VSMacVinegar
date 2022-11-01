@@ -1,19 +1,14 @@
 ﻿using System.Composition;
+using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.Editor;
-
+using Microsoft.CodeAnalysis.Host.Mef;
 using Microsoft.VisualStudio.Utilities;
 using ExportAttribute = System.ComponentModel.Composition.ExportAttribute;
     
 namespace Vinegar
 {
-
     public static class VinegarContentTypeDefinitions
     {
-        static VinegarContentTypeDefinitions()
-        {
-            var s = "hello";
-            s = "there;";
-        }
         [Export]
         [FileExtension(".vinegar")]
         [Name(ContentTypeNames.VinegarContentType)]
@@ -22,19 +17,12 @@ namespace Vinegar
         public static readonly ContentTypeDefinition VinegarContentTypeDefinition;
     }
 
-    public static class ContentTypeNames
-    {
-        public const string RoslynContentType = "Roslyn Languages";// Microsoft.CodeAnalysis.Editor.ContentTypeNames.RoslynContentType;
-        public const string VinegarContentType = "vinegar";
-    }
-
-    [ExportContentTypeLanguageService(ContentTypeNames.VinegarContentType, ContentTypeNames.VinegarContentType), Shared]
+    [ExportContentTypeLanguageService(ContentTypeNames.VinegarContentType, ContentTypeNames.VinegarContentType, ServiceLayer.Host), Shared]
     class VinegerContentTypeLanguageService : IContentTypeLanguageService
     {
         private readonly IContentTypeRegistryService _contentTypeRegistry;
 
         [ImportingConstructor]
-        //[Obsolete(MefConstruction.ImportingConstructorMessage, error: true)]
         public VinegerContentTypeLanguageService(IContentTypeRegistryService contentTypeRegistry)
         {
             _contentTypeRegistry = contentTypeRegistry;

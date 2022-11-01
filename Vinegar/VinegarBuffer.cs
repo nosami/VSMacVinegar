@@ -1,30 +1,32 @@
-﻿using System.Text;
+﻿using System.Collections.Immutable;
+using System.Text;
 using MonoDevelop.Core;
 
 namespace Vinegar
 {
-    class VinegarBuffer
+    public class VinegarBuffer
     {
         private readonly FilePath _filePath;
 
-        private SortedList<string, VinegarOutput> _lines = new SortedList<string, VinegarOutput>();
+        private SortedList<string, VinegarOutput> _sortedLines = new SortedList<string, VinegarOutput>();
         public VinegarBuffer(FilePath filePath)
         {
             _filePath = filePath;
         }
 
         public FilePath FilePath => _filePath;
-        internal SortedList<string, VinegarOutput> Lines { get => _lines; set => _lines = value; }
+        SortedList<string, VinegarOutput> SortedLines { get => _sortedLines; set => _sortedLines = value; }
+        public ImmutableList<VinegarOutput> Lines { get; private set; } = ImmutableList<VinegarOutput>.Empty;
 
         public string Build()
         {
             AddDirectory(_filePath);
-            var sb = new StringBuilder();
             var location = new OriginalLocation(_filePath);
-            sb.AppendLine($"{location}:");
-            foreach(var output in _lines)
+            Lines = new[] { location }.Union(SortedLines.Values).ToImmutableList();
+            var sb = new StringBuilder();
+            foreach(var output in Lines)
             {
-                sb.AppendLine(output.Key);
+                sb.AppendLine(output.ToString());
             }
             return sb.ToString();
         }
@@ -34,7 +36,7 @@ namespace Vinegar
             foreach (var dir in Directory.EnumerateDirectories(filePath))
             {
                 var location = new DirectoryLocation(dir);
-                _lines.Add(location.ToString(), location);
+                _sortedLines.Add(location.ToString(), location);
             }
             EnumerateFiles(filePath);
         }
@@ -44,12 +46,12 @@ namespace Vinegar
             foreach (var file in Directory.EnumerateFiles(dir))
             {
                 var location = new FileLocation(file);
-                _lines.Add(location.ToString(), location);
+                _sortedLines.Add(location.ToString(), location);
             }
         }
     }
 
-    abstract class VinegarOutput
+    public abstract class VinegarOutput
     {
         public VinegarOutput(FilePath location)
         {
@@ -64,7 +66,7 @@ namespace Vinegar
         }
     }
 
-    class OriginalLocation : VinegarOutput
+    public class OriginalLocation : VinegarOutput
     {
         public OriginalLocation(FilePath location) : base(location)
         {
@@ -72,18 +74,18 @@ namespace Vinegar
 
         public override string ToString()
         {
-            return Location.FullPath;
+            return Location.FullPath + ":";
         }
     }
 
-    class FileLocation : VinegarOutput
+    public class FileLocation : VinegarOutput
     {
         public FileLocation(FilePath location) : base(location)
         {
         }
     }
 
-    class DirectoryLocation : VinegarOutput
+    public class DirectoryLocation : VinegarOutput
     {
         public DirectoryLocation(FilePath location) : base(location)
         {

@@ -5,8 +5,9 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
     <TargetFramework>net6.0-macos</TargetFramework>
+    <OutputPath>..\build</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Microsoft.VisualStudioMac.Sdk" Version="17.0.0" />
   </ItemGroup>
@@ -18,8 +19,5 @@
     <Reference Include="Vim.Core">
       <HintPath>..\..\VsVim\Binaries\Debug\VimMac\net6.0-macos\Vim.Core.dll</HintPath>
     </Reference>
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\Roslyn.Hosting.Diagnostics\Roslyn.Hosting.Diagnostics.csproj" />
   </ItemGroup>
 </Project>

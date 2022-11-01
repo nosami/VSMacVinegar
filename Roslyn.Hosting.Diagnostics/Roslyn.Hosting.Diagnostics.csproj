@@ -8,6 +8,8 @@
     <SignAssembly>true</SignAssembly>
     <OtherFlags>--publicsign</OtherFlags>
     <AssemblyOriginatorKeyFile>roslyn.snk</AssemblyOriginatorKeyFile>
+    <OutputPath>..\build</OutputPath>
+    <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>
 
 
@@ -31,5 +33,8 @@
   </ItemGroup>
   <ItemGroup>
     <AddinReference Include="MonoDevelop.TextEditor" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Vinegar\Vinegar.csproj" />
   </ItemGroup>
 </Project>
