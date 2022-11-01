@@ -4,7 +4,7 @@
     <OutputType>Library</OutputType>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <TargetFramework>net6.0-macos</TargetFramework>
+    <TargetFramework>net7.0-macos12.3</TargetFramework>
     <OutputPath>..\build</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
   </PropertyGroup>

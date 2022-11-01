@@ -16,7 +16,7 @@ namespace Vinegar
 
         public ClassifiedSpan AdjustStaleClassification(SourceText text, ClassifiedSpan classifiedSpan)
         {
-            throw new NotImplementedException();
+            return classifiedSpan;
         }
 
         public TextChangeRange? ComputeSyntacticChangeRange(SolutionServices workspace, SyntaxNode oldRoot, SyntaxNode newRoot, TimeSpan timeout, CancellationToken cancellationToken)
@@ -59,7 +59,7 @@ namespace Vinegar
 
         Task IClassificationService.AddSyntacticClassificationsAsync(Document document, TextSpan textSpan, ArrayBuilder<ClassifiedSpan> result, CancellationToken cancellationToken)
         {
-            var doc = IdeApp.Workbench.Documents.FirstOrDefault(d => d.Name == document.FilePath);
+            var doc = IdeApp.Workbench.Documents.FirstOrDefault(d => d.FilePath == document.FilePath);
             var textView = doc.GetContent<ITextView>();
             var vinegarBuffer = (VinegarBuffer)textView.Properties[typeof(VinegarBuffer)];
 

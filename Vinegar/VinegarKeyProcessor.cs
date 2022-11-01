@@ -35,7 +35,7 @@ namespace Vinegar
                 var contentType = _contentTypeRegistryService.GetContentType(ContentTypeNames.VinegarContentType);
                 var textBuffer = vimBuffer.TextView.TextBuffer;
                 textBuffer.ChangeContentType(contentType, null);
-                _workspace.CreateDocument(textBuffer);
+                _workspace.CreateDocument(textBuffer, vimBuffer.Name);
                 
                 VinegarKeyProcessor.SetBufferText(path, vimBuffer.TextView);
             }
@@ -47,7 +47,6 @@ namespace Vinegar
         private readonly IVimBuffer _vimBuffer;
 
         public override bool IsInterestedInHandledEvents => true;
-        public const string VinegarBufferName = "/vinegar";
 
         public VinegarKeyProcessor(IVimBuffer vimBuffer)
         {
@@ -107,7 +106,7 @@ namespace Vinegar
                 var output = string.Empty;
                 stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
                 stream.Position = 0;
-                FilePath filePath = path.Combine(notebookIndex + ".vinegar");
+                FilePath filePath = path.Combine("/", notebookIndex + ".vinegar");
                 // Create the file descriptor to be loaded in the editor
                 var descriptor = new FileDescriptor(filePath, ContentTypeNames.VinegarContentType, stream, null);
 

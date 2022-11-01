@@ -15,6 +15,6 @@ using Mono.Addins.Description;
 [assembly: AddinAuthor("Jason Imison")]
 
 public static class VersionInfo
-{ 
-    public const string Version = "0.0.0.9";
+{
+    public const string Version = "0.0.0.12";
 }

@@ -18,10 +18,9 @@ namespace Vinegar
         {
         }
 
-        public void CreateDocument(ITextBuffer buffer)
+        public void CreateDocument(ITextBuffer buffer, string name)
         {
             var projectId = ProjectId.CreateNewId();
-            var name = "0.vinegar";
             var documentId = DocumentId.CreateNewId(projectId, name);
             var container = buffer.AsTextContainer();
 
