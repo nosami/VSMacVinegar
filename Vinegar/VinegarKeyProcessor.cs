@@ -55,15 +55,17 @@ namespace Vinegar
 
         public override void KeyDown(KeyEventArgs e)
         {
-            if (_vimBuffer.Name.EndsWith("vinegar") && _vimBuffer.Mode.ModeKind == ModeKind.Normal)
+            e.Handled = false;
+            if (_vimBuffer.Name.EndsWith("vinegar") && _vimBuffer.ModeKind == ModeKind.Normal)
             {
-                e.Handled = true;
                 if (e.Characters == "-")
                 {
+                    e.Handled = true;
                     HyphenPress();
                 }
                 else if ((NSKey)e.Event.KeyCode == NSKey.Return)
                 {
+                    e.Handled = true;
                     OpenFileOrFolder();
                 }
             }
@@ -74,10 +76,6 @@ namespace Vinegar
                     e.Handled = true;
                     HyphenPress();
                 }
-            }
-            else
-            {
-                e.Handled = false;
             }
         }
 
