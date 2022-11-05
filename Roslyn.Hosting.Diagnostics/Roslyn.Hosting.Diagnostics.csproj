@@ -10,6 +10,7 @@
     <AssemblyOriginatorKeyFile>roslyn.snk</AssemblyOriginatorKeyFile>
     <OutputPath>..\build</OutputPath>
     <AppendTargetFrameworkToOutputPath>false</AppendTargetFrameworkToOutputPath>
+    <DebugType>Embedded</DebugType>
   </PropertyGroup>
 
 

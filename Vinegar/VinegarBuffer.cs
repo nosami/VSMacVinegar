@@ -59,7 +59,7 @@ namespace Vinegar
         }
 
         public FilePath Location { get; }
-
+        public bool Match { get; }
         public override string ToString()
         {
             return Location.FileName;
