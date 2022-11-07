@@ -116,7 +116,7 @@ namespace Vinegar
 
                 FilePath filePath = path.Combine(notebookIndex + ".vinegar");
                 //var spaces = new string('\n', 1000);
-                File.WriteAllText(filePath, output);
+                //File.WriteAllText(filePath, output);
                 // Create the file descriptor to be loaded in the editor
                 var descriptor = new FileDescriptor(filePath, ContentTypeNames.VinegarContentType, stream, null);
                 descriptor.OpenAsReadOnly = true;
