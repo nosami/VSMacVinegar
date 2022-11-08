@@ -1,5 +1,4 @@
 ﻿using System.ComponentModel.Composition;
-using Gtk;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
@@ -32,13 +31,12 @@ namespace Vinegar
             {
                 vimBuffer.LocalSettings.Number = false;
                 vimBuffer.LocalSettings.RelativeNumber = false;
-                var path = new FilePath(vimBuffer.Name).ParentDirectory;
 
                 var contentType = _contentTypeRegistryService.GetContentType(ContentTypeNames.VinegarContentType);
                 var textBuffer = vimBuffer.TextView.TextBuffer;
                 textBuffer.ChangeContentType(contentType, null);
                 _workspace.CreateDocument(textBuffer, vimBuffer.Name);
-                VinegarKeyProcessor.SetBufferText(path, VinegarKeyProcessor.From, vimBuffer.TextView);
+                VinegarKeyProcessor.SetBufferText(VinegarKeyProcessor.Path, VinegarKeyProcessor.From, vimBuffer.TextView);
             }
         }
     }
@@ -46,10 +44,13 @@ namespace Vinegar
     class VinegarKeyProcessor : KeyProcessor 
     {
         private readonly IVimBuffer _vimBuffer;
+
         public static FilePath From { get; private set; }
+        public static FilePath Path { get; private set; }
 
         public override bool IsInterestedInHandledEvents => true;
 
+        FilePath tempPath = System.IO.Path.GetTempPath();
         public VinegarKeyProcessor(IVimBuffer vimBuffer)
         {
             _vimBuffer = vimBuffer;
@@ -107,23 +108,23 @@ namespace Vinegar
         {
             if (newView)
             {
-                using var stream = new MemoryStream();
-                //var output = string.Empty;
-                var vinegarBuffer = new VinegarBuffer(path);
-                string output = vinegarBuffer.Build();
-                stream.Write(System.Text.Encoding.UTF8.GetBytes(output));
-                stream.Position = 0;
-
-                FilePath filePath = path.Combine(notebookIndex + ".vinegar");
-                //var spaces = new string('\n', 1000);
-                //File.WriteAllText(filePath, output);
-                // Create the file descriptor to be loaded in the editor
-                var descriptor = new FileDescriptor(filePath, ContentTypeNames.VinegarContentType, stream, null);
-                descriptor.OpenAsReadOnly = true;
+                FilePath filePath = tempPath.Combine(notebookIndex + ".vinegar");
+                Path = path;
                 From = from;
-                IdeServices.DocumentManager.OpenDocument(descriptor);
+                Runtime.RunInMainThread(async delegate
+                {
+                    using (var stream = new MemoryStream())
+                    {
+                        var descriptor = new FileDescriptor(filePath, ContentTypeNames.VinegarContentType, stream, null);
+                        descriptor.OpenAsReadOnly = true;
+                        var doc = await IdeServices.DocumentManager.OpenDocument(descriptor);
 
-                // Buffer text is set when the ITextView materializes
+                        var textView = doc.GetContent<ITextView>();
+                        if (textView != null)
+                            SetBufferText(path, from, textView);
+                        // else Buffer text is set when the ITextView materializes
+                    }
+                });
             }
             else
             {
