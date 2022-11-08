@@ -1,4 +1,5 @@
 ﻿using System.ComponentModel.Composition;
+using Microsoft.Toolkit.HighPerformance.Buffers;
 using Microsoft.VisualStudio.Text;
 using Microsoft.VisualStudio.Text.Editor;
 using Microsoft.VisualStudio.Utilities;
@@ -61,6 +62,10 @@ namespace Vinegar
             e.Handled = false;
             if (_vimBuffer.Name.EndsWith("vinegar") && _vimBuffer.ModeKind == ModeKind.Normal)
             {
+                var search = _vimBuffer.IncrementalSearch;
+                if (search.HasActiveSession)
+                    return;
+
                 if (e.Characters == "-")
                 {
                     e.Handled = true;
